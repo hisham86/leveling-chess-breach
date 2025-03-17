@@ -1,4 +1,3 @@
-
 import { GridPosition, Character, Tile, GameState } from './types';
 
 // Calculate Manhattan distance between two grid positions
@@ -117,43 +116,40 @@ export const createGameBoard = (width: number, height: number): Tile[][] => {
 };
 
 // Create initial game state
-export const createInitialGameState = (
-  player1Id: string,
-  player2Id: string,
-  boardWidth: number = 8,
-  boardHeight: number = 8
-): GameState => {
-  const gameBoard = createGameBoard(boardWidth, boardHeight);
+export const createInitialGameState = (playerId: string, aiPlayerId: string): GameState => {
+  const gameBoard = createGameBoard(8, 8);
   
   // Create players
   const players = [
     {
-      id: player1Id,
+      id: playerId,
       name: 'Player 1',
       characters: [],
       isCurrentTurn: true
     },
     {
-      id: player2Id,
-      name: 'Player 2',
+      id: aiPlayerId,
+      name: 'AI Player',
       characters: [],
       isCurrentTurn: false
     }
   ];
   
-  return {
+  const initialState: GameState = {
     players,
     gameBoard,
-    currentPlayerId: player1Id,
+    currentPlayerId: playerId,
     selectedCharacterId: null,
     gamePhase: 'setup',
     turn: 1,
-    boardSize: { width: boardWidth, height: boardHeight },
+    boardSize: { width: 8, height: 8 },
     winner: null,
     actionMode: 'none',
     selectedAbilityId: null,
-    gameMode: 'standard' // Add the gameMode property with default value
+    gameMode: 'storyline'
   };
+  
+  return initialState;
 };
 
 // Calculate damage between attacker and defender
@@ -177,4 +173,3 @@ export const calculateDamage = (attacker: Character, defender: Character): numbe
 export const generateId = (): string => {
   return Math.random().toString(36).substring(2, 15);
 };
-
