@@ -20,7 +20,7 @@ const GameTitle = () => {
         </span>
       </h1>
       <p className="text-sm md:text-base text-gray-400 mt-2 font-mono tracking-wider">
-        SHADOW • TACTICAL RPG
+        SHADOW • TURN-BASED STRATEGY
       </p>
     </div>
   );
