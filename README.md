@@ -1,69 +1,70 @@
-# Welcome to your Lovable project
 
-## Project info
+# Monarch Gambit
 
-**URL**: https://lovable.dev/projects/f507ab5c-5b77-4181-bab2-6e9df8c08bd6
+![Monarch Gambit](public/og-image.png)
 
-## How can I edit this code?
+## About the Game
 
-There are several ways of editing your application.
+Monarch Gambit is a turn-based strategy game that combines chess-like movement with RPG elements. Set in a shadowy world, players command a team of characters with unique abilities to outmaneuver their opponents.
 
-**Use Lovable**
+## Game Modes
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f507ab5c-5b77-4181-bab2-6e9df8c08bd6) and start prompting.
+- **Chess Mode**: Characters move according to chess rules based on their class:
+  - Hunters move like queens
+  - Tanks move like rooks
+  - Mages move like bishops
+  - Assassins move like knights
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Storyline Mode**: (Coming Soon) Complete missions to progress through the story and level up your characters.
 
-**Use your preferred IDE**
+## Character Classes
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Hunter**: Versatile units with queen-like movement
+- **Tank**: Powerful defensive units with rook-like movement
+- **Mage**: Spellcasting units with bishop-like movement
+- **Assassin**: Stealthy units with knight-like movement
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## How to Play
 
-Follow these steps:
+1. Select a game mode
+2. Choose your faction
+3. Position your characters on the board
+4. Take turns moving and attacking to defeat your opponent
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Development
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+This project is built with:
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
 - React
+- TypeScript
+- Vite
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Project Info
 
-Simply open [Lovable](https://lovable.dev/projects/f507ab5c-5b77-4181-bab2-6e9df8c08bd6) and click on Share -> Publish.
+**URL**: https://lovable.dev/projects/f507ab5c-5b77-4181-bab2-6e9df8c08bd6
 
-## I want to use a custom domain - is that possible?
+## How to Run Locally
+
+```sh
+# Clone the repository
+git clone <YOUR_GIT_URL>
+
+# Navigate to the project directory
+cd <YOUR_PROJECT_NAME>
+
+# Install dependencies
+npm i
+
+# Start the development server
+npm run dev
+```
+
+## Deployment
+
+To deploy this project, simply open [Lovable](https://lovable.dev/projects/f507ab5c-5b77-4181-bab2-6e9df8c08bd6) and click on Share -> Publish.
+
+## Custom Domain
 
 We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
