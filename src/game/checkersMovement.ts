@@ -8,7 +8,7 @@ export const getCheckersValidMoves = (character: Character, gameState: GameState
   const isPlayer1 = character.owner === gameState.players[0].id;
   
   // Forward direction depends on which player the character belongs to
-  const forwardY = isPlayer1 ? 1 : -1;
+  const forwardY = isPlayer1 ? -1 : 1;
   
   // Regular moves (diagonal forward)
   const regularMoves = [
@@ -51,7 +51,7 @@ export const getCheckersValidMoves = (character: Character, gameState: GameState
   
   // S-Rank characters can move backward (king in checkers)
   if (character.rank === 'S') {
-    const backwardY = isPlayer1 ? -1 : 1;
+    const backwardY = isPlayer1 ? 1 : -1;
     
     // Regular backward moves
     const kingMoves = [
