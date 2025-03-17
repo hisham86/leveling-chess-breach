@@ -1,11 +1,102 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import MainMenu from '@/components/MainMenu';
+import GameTitle from '@/components/GameTitle';
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const { toast } = useToast();
+  const [profile, setProfile] = useState("Commander");
+
+  const handleNewGame = () => {
+    toast({
+      title: "Starting new game...",
+      description: "Preparing tactical systems",
+    });
+  };
+
+  const handleContinue = () => {
+    toast({
+      title: "Loading saved game...",
+      description: "Retrieving tactical data",
+    });
+  };
+
+  const handleOptions = () => {
+    toast({
+      description: "Options menu coming soon",
+    });
+  };
+
+  const handleQuit = () => {
+    window.close();
+    // Fallback message if window.close() is blocked by browser
+    toast({
+      description: "Quit function only works when deployed",
+      variant: "destructive",
+    });
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-solo-dark">
+      {/* Background with grid pattern and ambient shadows */}
+      <div 
+        className="absolute inset-0 z-0" 
+        style={{
+          backgroundImage: `
+            linear-gradient(to bottom, rgba(26, 27, 38, 0.8), rgba(26, 27, 38, 0.95)), 
+            url('lovable-uploads/1de3b83e-d7f2-416b-8fe9-e128545ab4b4.png')
+          `,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'brightness(0.7)',
+        }}
+      />
+
+      <div className="z-10 w-full h-full flex flex-col md:flex-row">
+        <div className="w-full md:w-1/2 flex flex-col justify-center items-center md:items-start px-8 py-10">
+          <div className="w-full max-w-sm">
+            <GameTitle />
+            
+            <div className="mt-16">
+              <MainMenu 
+                onContinue={handleContinue}
+                onNewGame={handleNewGame} 
+                onOptions={handleOptions}
+                onCredits={() => {}}
+                onQuit={handleQuit}
+              />
+            </div>
+
+            <div className="mt-8">
+              <div className="bg-solo-dark/80 backdrop-blur-sm px-4 py-2 border-l-4 border-solo-accent mb-1">
+                <p className="text-white font-mono tracking-wide">Profile: {profile}</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-gray-400 hover:text-white font-mono tracking-wide hover:bg-solo-purple/30 transition-all duration-200 mb-1"
+              >
+                Achievements
+              </Button>
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start text-gray-400 hover:text-white font-mono tracking-wide hover:bg-solo-purple/30 transition-all duration-200"
+              >
+                Statistics
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <div className="hidden md:flex md:w-1/2 relative">
+          {/* This space is for game art/visual elements that will appear on the right side */}
+        </div>
+      </div>
+
+      <div className="absolute bottom-2 right-2 text-xs text-gray-500 font-mono">
+        v1.0.0 • Tactical RPG Engine
       </div>
     </div>
   );
