@@ -41,17 +41,17 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-solo-dark">
-      {/* Background with grid pattern and ambient shadows */}
+      {/* Background with new Solo Leveling image */}
       <div 
         className="absolute inset-0 z-0" 
         style={{
           backgroundImage: `
-            linear-gradient(to bottom, rgba(26, 27, 38, 0.8), rgba(26, 27, 38, 0.95)), 
-            url('lovable-uploads/1de3b83e-d7f2-416b-8fe9-e128545ab4b4.png')
+            linear-gradient(to bottom, rgba(26, 27, 38, 0.5), rgba(26, 27, 38, 0.8)), 
+            url('/lovable-uploads/e7db9cd6-6d04-497d-8c2f-22727e256434.png')
           `,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: 'brightness(0.7)',
+          filter: 'brightness(0.9)',
         }}
       />
 
