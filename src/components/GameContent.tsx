@@ -4,6 +4,7 @@ import GameBoard from '@/components/GameBoard';
 import GameController from '@/components/GameController';
 import { GameState } from '@/game/types';
 import { toast } from 'sonner';
+import BonusObjectives from '@/components/BonusObjectives';
 
 interface GameContentProps {
   gameState: GameState | null;
@@ -54,6 +55,9 @@ const GameContent: React.FC<GameContentProps> = ({
         
         {/* Game info panel */}
         <GameInfoPanel gameState={gameState} />
+        
+        {/* Bonus Objectives Panel */}
+        <BonusObjectives />
       </div>
     </div>
   );
@@ -72,6 +76,23 @@ const GameInfoPanel: React.FC<GameInfoPanelProps> = ({ gameState }) => {
         <div>Current Player: <span className="text-white">{
           gameState?.players.find(p => p.id === gameState.currentPlayerId)?.name || 'Loading...'
         }</span></div>
+        
+        {/* Power Grid Status */}
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs">Power Grid</span>
+            <span className="text-xs text-solo-accent">25%</span>
+          </div>
+          <div className="h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+            <div className="bg-solo-accent h-full" style={{ width: '25%' }}></div>
+          </div>
+        </div>
+        
+        <div>Turn: <span className="text-white">{gameState?.turn || '0'}</span></div>
+        
+        <div className="p-2 bg-solo-blue/20 border border-solo-accent/20 rounded-md mt-3 text-xs">
+          Victory in <span className="text-solo-accent font-bold">4</span> turns
+        </div>
       </div>
     </div>
   );
