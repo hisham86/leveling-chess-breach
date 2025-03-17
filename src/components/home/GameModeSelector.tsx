@@ -12,7 +12,7 @@ interface GameModeSelectorProps {
 
 const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMode }) => {
   return (
-    <div className="mt-8 mb-4 border-l-4 border-solo-accent px-4 py-3">
+    <div className="mt-8 mb-4 bg-black/60 backdrop-blur-sm px-4 py-3 border-l-4 border-solo-accent">
       <p className="text-white font-mono tracking-wide mb-2">Game Mode:</p>
       <ToggleGroup 
         type="single" 
