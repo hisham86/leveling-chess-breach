@@ -2,7 +2,7 @@
 import React from 'react';
 import GameBoard from '@/components/GameBoard';
 import GameController from '@/components/GameController';
-import { GameState } from '@/game/types';
+import { GameState, Character } from '@/game/types';
 import { toast } from 'sonner';
 import BonusObjectives from '@/components/BonusObjectives';
 
@@ -11,20 +11,34 @@ interface GameContentProps {
   setGameState: (gameState: GameState) => void;
   isLoading: boolean;
   faction: string;
+  onCharacterSelect?: (character: Character | null) => void;
 }
 
 const GameContent: React.FC<GameContentProps> = ({ 
   gameState, 
   setGameState, 
   isLoading,
-  faction 
+  faction,
+  onCharacterSelect
 }) => {
   
   const handleTileClick = (x: number, y: number) => {
     if (!gameState || isLoading) return;
     
-    // Handle tile click based on game state and selected actions
-    toast.info(`Clicked tile at ${x}, ${y}`);
+    // Find if there's a character at the clicked position
+    const allCharacters = gameState.players.flatMap(player => player.characters);
+    const characterAtPosition = allCharacters.find(
+      char => char.position.x === x && char.position.y === y
+    );
+    
+    // If there's a character, select it
+    if (characterAtPosition && onCharacterSelect) {
+      onCharacterSelect(characterAtPosition);
+      toast.info(`Selected ${characterAtPosition.name}`);
+    } else {
+      // Handle tile click based on game state and selected actions
+      toast.info(`Clicked tile at ${x}, ${y}`);
+    }
   };
   
   return (
@@ -36,7 +50,10 @@ const GameContent: React.FC<GameContentProps> = ({
             Loading game...
           </div>
         ) : gameState ? (
-          <GameBoard gameState={gameState} onTileClick={handleTileClick} />
+          <GameBoard 
+            gameState={gameState} 
+            onTileClick={handleTileClick}
+          />
         ) : (
           <div className="flex items-center justify-center h-80 bg-solo-dark/50 border border-solo-accent/20 rounded-lg">
             Failed to load game

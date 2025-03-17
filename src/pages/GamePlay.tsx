@@ -1,13 +1,30 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useGameLoader } from '@/hooks/useGameLoader';
 import GameHeader from '@/components/GameHeader';
 import GameContent from '@/components/GameContent';
 import { Zap, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import CharacterDetails from '@/components/CharacterDetails';
+import { Character } from '@/game/types';
 
 const GamePlay = () => {
   const { gameState, setGameState, isLoading, faction } = useGameLoader();
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(null);
+  
+  // Find Sung Jinwoo in the character list when the game loads
+  React.useEffect(() => {
+    if (gameState && !selectedCharacter) {
+      // Find Sung Jinwoo in player characters
+      const sungJinwoo = gameState.players
+        .flatMap(player => player.characters)
+        .find(character => character.name === 'Sung Jin-Woo');
+      
+      if (sungJinwoo) {
+        setSelectedCharacter(sungJinwoo);
+      }
+    }
+  }, [gameState, selectedCharacter]);
   
   return (
     <div className="min-h-screen flex flex-col bg-solo-dark text-white">
@@ -61,12 +78,21 @@ const GamePlay = () => {
         </Button>
       </div>
       
-      <GameContent 
-        gameState={gameState} 
-        setGameState={setGameState} 
-        isLoading={isLoading} 
-        faction={faction}
-      />
+      <div className="flex flex-col md:flex-row flex-grow">
+        <div className="md:w-3/4">
+          <GameContent 
+            gameState={gameState} 
+            setGameState={setGameState} 
+            isLoading={isLoading} 
+            faction={faction}
+            onCharacterSelect={setSelectedCharacter}
+          />
+        </div>
+        
+        <div className="md:w-1/4 p-4">
+          <CharacterDetails character={selectedCharacter} />
+        </div>
+      </div>
     </div>
   );
 };
