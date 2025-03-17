@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import MainMenu from '@/components/MainMenu';
 import GameTitle from '@/components/GameTitle';
 import { useToast } from "@/hooks/use-toast";
-import { Coffee, Twitter, Linkedin, User } from "lucide-react";
+import { Coffee, Twitter, Linkedin, User, Clock } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -18,13 +19,15 @@ import UserProfile from "@/components/UserProfile";
 import { saveGame, getLatestSavedGame } from "@/services/gameService";
 import type { GameState } from "@/game/types";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
   const [faction, setFaction] = useState("S-RANK HUNTERS");
-  const [gameMode, setGameMode] = useState<"standard" | "chess" | "checkers">("standard");
+  const [gameMode, setGameMode] = useState<"storyline" | "chess" | "checkers">("chess");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [hasSavedGame, setHasSavedGame] = useState(false);
   
@@ -37,7 +40,9 @@ const Index = () => {
         if (latestSave) {
           setFaction(latestSave.faction);
           if (latestSave.game_data && latestSave.game_data.gameMode) {
-            setGameMode(latestSave.game_data.gameMode);
+            // Convert 'standard' to 'storyline' if needed
+            const savedMode = latestSave.game_data.gameMode === 'standard' ? 'chess' : latestSave.game_data.gameMode;
+            setGameMode(savedMode);
           }
         }
       } else {
@@ -166,13 +171,28 @@ const Index = () => {
           <div className="w-full max-w-sm">
             <GameTitle />
             
-            {/* Game Mode Selection - Updated with Checkers */}
+            {/* Game Mode Selection - Renamed Standard to Storyline and added Coming Soon */}
             <div className="mt-8 mb-4 bg-solo-dark/80 backdrop-blur-sm px-4 py-3 border-l-4 border-solo-accent">
               <p className="text-white font-mono tracking-wide mb-2">Game Mode:</p>
-              <ToggleGroup type="single" value={gameMode} onValueChange={(value) => value && setGameMode(value as "standard" | "chess" | "checkers")}>
-                <ToggleGroupItem value="standard" className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple">
-                  Standard
-                </ToggleGroupItem>
+              <ToggleGroup type="single" value={gameMode} onValueChange={(value) => value && setGameMode(value as "storyline" | "chess" | "checkers")}>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="inline-block">
+                        <ToggleGroupItem disabled value="storyline" className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple opacity-60 cursor-not-allowed">
+                          Storyline
+                          <Badge variant="outline" className="ml-2 bg-amber-500/20 text-amber-300 border-amber-500/50">
+                            <Clock size={12} className="mr-1" />
+                            Soon
+                          </Badge>
+                        </ToggleGroupItem>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Storyline mode coming soon</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
                 <ToggleGroupItem value="chess" className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple">
                   Chess
                 </ToggleGroupItem>
