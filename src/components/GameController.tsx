@@ -23,6 +23,7 @@ const GameController: React.FC<GameControllerProps> = ({
   faction
 }) => {
   const [selectedAction, setSelectedAction] = useState<'move' | 'attack' | 'ability' | null>(null);
+  const { user } = useAuth();
   
   const handleEndTurn = () => {
     if (!gameState) return;
@@ -30,7 +31,10 @@ const GameController: React.FC<GameControllerProps> = ({
     const newGameState = endTurn(gameState);
     setGameState(newGameState);
     
-    saveGame(faction, newGameState);
+    // Only save game for logged-in users
+    if (user) {
+      saveGame(faction, newGameState);
+    }
     
     toast.info(`Turn ${newGameState.turn}: ${newGameState.players.find(
       p => p.id === newGameState.currentPlayerId
@@ -87,6 +91,31 @@ const GameController: React.FC<GameControllerProps> = ({
       </div>
       
       <GameModeDisplay gameState={gameState} />
+      
+      {/* Chess/Checkers Rules Hint */}
+      {gameState?.gameMode === 'chess' && (
+        <div className="text-xs text-gray-400 mt-2 p-2 bg-gray-800/50 rounded">
+          <p className="font-bold mb-1">Chess Piece Movement:</p>
+          <ul className="list-disc pl-4 space-y-0.5">
+            <li>Hunter (Queen): Any direction, any distance</li>
+            <li>Tank (Rook): Straight lines only</li>
+            <li>Mage (Bishop): Diagonal lines only</li>
+            <li>Assassin (Knight): L-shaped movement</li>
+            <li>Monster (Pawn/King): Limited movement</li>
+          </ul>
+        </div>
+      )}
+      
+      {gameState?.gameMode === 'checkers' && (
+        <div className="text-xs text-gray-400 mt-2 p-2 bg-gray-800/50 rounded">
+          <p className="font-bold mb-1">Checkers Movement:</p>
+          <ul className="list-disc pl-4 space-y-0.5">
+            <li>Move diagonally forward</li>
+            <li>Capture by jumping over opponent</li>
+            <li>S-Rank pieces can move backward</li>
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
