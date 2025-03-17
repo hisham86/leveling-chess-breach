@@ -51,34 +51,38 @@ const Index = () => {
     checkSavedGames();
   }, [user]);
 
-  const handleNewGame = async () => {
-    if (!user) {
+  const handleNewGame = () => {
+    // Allow guest play without login for chess and checkers modes
+    if (gameMode === 'storyline' && !user) {
       setIsAuthModalOpen(true);
       return;
     }
     
     toast({
       title: "Starting new game...",
-      description: "Preparing tactical systems",
+      description: `Preparing ${user ? '' : 'guest'} tactical systems`,
     });
     
-    // This is just a placeholder for actual game data structure
-    const mockGameState = {
-      players: [],
-      gameBoard: [],
-      currentPlayerId: '',
-      selectedCharacterId: null,
-      gamePhase: 'setup' as const,
-      turn: 1,
-      boardSize: { width: 10, height: 10 },
-      winner: null,
-      actionMode: 'none' as const,
-      selectedAbilityId: null,
-      gameMode: gameMode
-    };
-    
-    // Save initial game state
-    await saveGame(faction, mockGameState as GameState);
+    // Skip saving for guest users
+    if (user) {
+      // This is just a placeholder for actual game data structure
+      const mockGameState = {
+        players: [],
+        gameBoard: [],
+        currentPlayerId: '',
+        selectedCharacterId: null,
+        gamePhase: 'setup' as const,
+        turn: 1,
+        boardSize: { width: 10, height: 10 },
+        winner: null,
+        actionMode: 'none' as const,
+        selectedAbilityId: null,
+        gameMode: gameMode
+      };
+      
+      // Save initial game state for logged in users
+      saveGame(faction, mockGameState as GameState);
+    }
     
     // Navigate to game
     navigate('/game');

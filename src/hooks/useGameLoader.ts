@@ -18,57 +18,56 @@ export function useGameLoader() {
 
   useEffect(() => {
     const loadGame = async () => {
-      if (!user) {
-        toast.error("You need to be logged in to play");
-        navigate('/');
-        return;
-      }
-      
       setIsLoading(true);
       
       try {
-        // Try to load saved game
-        const savedGame = await getLatestSavedGame();
-        
-        if (savedGame) {
-          setGameState(savedGame.game_data);
-          setFaction(savedGame.faction);
-          if (savedGame.game_data.gameMode) {
-            setGameMode(savedGame.game_data.gameMode);
+        // If user is logged in, try to load saved game
+        if (user) {
+          const savedGame = await getLatestSavedGame();
+          
+          if (savedGame) {
+            setGameState(savedGame.game_data);
+            setFaction(savedGame.faction);
+            if (savedGame.game_data.gameMode) {
+              setGameMode(savedGame.game_data.gameMode);
+            }
+            toast.success("Game loaded successfully");
+            setIsLoading(false);
+            return;
           }
-          toast.success("Game loaded successfully");
-        } else {
-          // Create a new game if none exists
-          const aiPlayerId = 'ai-player';
-          const initialState = createInitialGameState(user.id, aiPlayerId);
-          
-          // Add game mode (use the current gameMode state, which defaults to chess)
-          initialState.gameMode = gameMode;
-          
-          // Create characters based on faction
-          const playerCharacters = generatePresetCharacters(user.id, true);
-          const aiCharacters = generatePresetCharacters(aiPlayerId, false);
-          
-          initialState.players[0].characters = playerCharacters;
-          initialState.players[1].characters = aiCharacters;
-          
-          // Update the board with character positions
-          const allCharacters = [...playerCharacters, ...aiCharacters];
-          initialState.gameBoard = initialState.gameBoard.map(row => 
-            row.map(tile => {
-              const charAtPos = allCharacters.find(
-                c => c.position.x === tile.position.x && c.position.y === tile.position.y
-              );
-              return {
-                ...tile,
-                occupiedBy: charAtPos ? charAtPos.id : null
-              };
-            })
-          );
-          
-          setGameState(initialState);
-          toast.info(`New ${gameMode} game created`);
         }
+        
+        // Create a new game (for both logged in and guest users)
+        const playerUserId = user ? user.id : 'guest-player';
+        const aiPlayerId = 'ai-player';
+        const initialState = createInitialGameState(playerUserId, aiPlayerId);
+        
+        // Add game mode (use the current gameMode state, which defaults to chess)
+        initialState.gameMode = gameMode;
+        
+        // Create characters based on faction
+        const playerCharacters = generatePresetCharacters(playerUserId, true);
+        const aiCharacters = generatePresetCharacters(aiPlayerId, false);
+        
+        initialState.players[0].characters = playerCharacters;
+        initialState.players[1].characters = aiCharacters;
+        
+        // Update the board with character positions
+        const allCharacters = [...playerCharacters, ...aiCharacters];
+        initialState.gameBoard = initialState.gameBoard.map(row => 
+          row.map(tile => {
+            const charAtPos = allCharacters.find(
+              c => c.position.x === tile.position.x && c.position.y === tile.position.y
+            );
+            return {
+              ...tile,
+              occupiedBy: charAtPos ? charAtPos.id : null
+            };
+          })
+        );
+        
+        setGameState(initialState);
+        toast.info(`New ${gameMode} game started${user ? '' : ' (guest mode)'}`);
       } catch (error) {
         console.error("Error loading game:", error);
         toast.error("Failed to load game");
