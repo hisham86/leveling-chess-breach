@@ -14,7 +14,7 @@ export function useGameLoader() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [faction, setFaction] = useState('S-RANK HUNTERS');
-  const [gameMode, setGameMode] = useState<'standard' | 'chess' | 'checkers'>('standard');
+  const [gameMode, setGameMode] = useState<'storyline' | 'chess' | 'checkers'>('storyline');
 
   useEffect(() => {
     const loadGame = async () => {

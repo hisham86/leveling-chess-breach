@@ -41,7 +41,7 @@ const Index = () => {
           setFaction(latestSave.faction);
           if (latestSave.game_data && latestSave.game_data.gameMode) {
             // Convert 'standard' to 'storyline' if needed
-            const savedMode = latestSave.game_data.gameMode === 'standard' ? 'chess' : latestSave.game_data.gameMode;
+            const savedMode = latestSave.game_data.gameMode === 'standard' ? 'storyline' : latestSave.game_data.gameMode;
             setGameMode(savedMode);
           }
         }
