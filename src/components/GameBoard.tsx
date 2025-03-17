@@ -63,18 +63,13 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameState, onTileClick }) => {
                   >
                     {/* Tile content */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      {character && <CharacterToken character={character} />}
+                      {character && <IsometricCharacter character={character} />}
                       
                       {/* Highlight and grid lines */}
                       {tile.highlighted && (
                         <div className={`absolute inset-0 ${getHighlightClass(tile.highlightType)}`}></div>
                       )}
                     </div>
-                    
-                    {/* Coordinate display (only during development) */}
-                    {/* <div className="absolute bottom-0 right-1 text-[8px] text-white opacity-50">
-                      {x},{y}
-                    </div> */}
                     
                     {/* Terrain features - can be customized based on tile type */}
                     {tile.type === 'blocked' && (
@@ -149,48 +144,156 @@ const getHighlightClass = (type: 'move' | 'attack' | 'ability' | 'none'): string
   }
 };
 
-const CharacterToken: React.FC<{ character: Character }> = ({ character }) => {
-  const ownerColor = character.owner.includes('1') ? 'bg-blue-600' : 'bg-red-600';
+// New isometric character component with cell-shaded style
+const IsometricCharacter: React.FC<{ character: Character }> = ({ character }) => {
+  // Determine base color scheme based on owner
+  const isPlayer1 = character.owner.includes('1');
+  
+  // Color schemes for hunters and monsters
+  const baseColors = {
+    body: isPlayer1 ? 'bg-blue-700' : 'bg-red-700',
+    highlight: isPlayer1 ? 'bg-blue-500' : 'bg-red-500',
+    shadow: isPlayer1 ? 'bg-blue-900' : 'bg-red-900',
+    outline: isPlayer1 ? 'border-blue-400' : 'border-red-400',
+  };
+  
+  // Adjust color scheme based on character class
+  const getClassColorAccent = () => {
+    switch(character.class) {
+      case 'Tank': return 'border-blue-300';
+      case 'Mage': return 'border-purple-300';
+      case 'Hunter': return 'border-green-300';
+      case 'Assassin': return 'border-red-300';
+      default: return 'border-orange-300';
+    }
+  };
+  
+  // Get rank-specific styling
+  const getRankStyle = () => {
+    switch(character.rank) {
+      case 'S': return 'ring-2 ring-yellow-400 shadow-yellow-glow';
+      case 'A': return 'ring-2 ring-purple-400';
+      case 'B': return 'ring-1 ring-blue-400';
+      default: return '';
+    }
+  };
+  
+  // Class-specific character shape
+  const getCharacterShape = () => {
+    switch(character.class) {
+      case 'Tank':
+        return (
+          <div className="relative w-10 h-10">
+            {/* Main body - blocky shape for tanks */}
+            <div className={`absolute inset-0 ${baseColors.body} rounded-md transform translate-y-[-4px]`}></div>
+            {/* Highlight */}
+            <div className={`absolute top-0 left-0 right-3 h-2 ${baseColors.highlight} rounded-t-md`}></div>
+            {/* Shadow */}
+            <div className={`absolute bottom-0 right-0 left-3 h-2 ${baseColors.shadow} rounded-b-md`}></div>
+            {/* Shield detail */}
+            <div className="absolute top-1 left-1 w-4 h-6 bg-gray-400 rounded-t-md transform rotate-[-5deg]"></div>
+          </div>
+        );
+      
+      case 'Mage':
+        return (
+          <div className="relative w-9 h-11">
+            {/* Main body - tall and narrow for mages */}
+            <div className={`absolute inset-0 ${baseColors.body} rounded-md transform translate-y-[-6px]`}></div>
+            {/* Highlight */}
+            <div className={`absolute top-0 left-0 right-4 h-2 ${baseColors.highlight} rounded-t-md`}></div>
+            {/* Shadow */}
+            <div className={`absolute bottom-0 right-0 left-4 h-2 ${baseColors.shadow} rounded-b-md`}></div>
+            {/* Staff detail */}
+            <div className="absolute -right-1 -top-1 w-1 h-7 bg-purple-300 transform rotate-[15deg]"></div>
+          </div>
+        );
+      
+      case 'Hunter':
+        return (
+          <div className="relative w-9 h-9">
+            {/* Main body - balanced shape for hunters */}
+            <div className={`absolute inset-0 ${baseColors.body} rounded-md transform translate-y-[-4px]`}></div>
+            {/* Highlight */}
+            <div className={`absolute top-0 left-0 right-3 h-2 ${baseColors.highlight} rounded-t-md`}></div>
+            {/* Shadow */}
+            <div className={`absolute bottom-0 right-0 left-3 h-2 ${baseColors.shadow} rounded-b-md`}></div>
+            {/* Bow detail */}
+            <div className="absolute -left-2 top-1 w-1 h-5 bg-green-300 transform rotate-[30deg] rounded-full"></div>
+          </div>
+        );
+      
+      case 'Assassin':
+        return (
+          <div className="relative w-8 h-9">
+            {/* Main body - sleek shape for assassins */}
+            <div className={`absolute inset-0 ${baseColors.body} rounded-md transform skew-x-[-5deg] translate-y-[-4px]`}></div>
+            {/* Highlight */}
+            <div className={`absolute top-0 left-0 right-4 h-2 ${baseColors.highlight} rounded-t-md skew-x-[-5deg]`}></div>
+            {/* Shadow */}
+            <div className={`absolute bottom-0 right-0 left-3 h-2 ${baseColors.shadow} rounded-b-md skew-x-[-5deg]`}></div>
+            {/* Dagger detail */}
+            <div className="absolute -right-1 top-3 w-3 h-1 bg-gray-300 transform rotate-[30deg]"></div>
+          </div>
+        );
+      
+      case 'Monster':
+        return (
+          <div className="relative w-10 h-10">
+            {/* Main body - irregular shape for monsters */}
+            <div className={`absolute inset-0 ${baseColors.body} rounded-md transform translate-y-[-3px] rotate-[5deg]`}></div>
+            {/* Highlight */}
+            <div className={`absolute top-0 left-0 right-4 h-2 ${baseColors.highlight} rounded-t-md transform rotate-[5deg]`}></div>
+            {/* Shadow */}
+            <div className={`absolute bottom-0 right-0 left-2 h-3 ${baseColors.shadow} rounded-b-md transform rotate-[5deg]`}></div>
+            {/* Monster detail - horns or spikes */}
+            <div className="absolute -left-1 -top-1 w-2 h-2 bg-orange-300 transform rotate-[-20deg] rounded-t-md"></div>
+            <div className="absolute -right-1 -top-1 w-2 h-2 bg-orange-300 transform rotate-[20deg] rounded-t-md"></div>
+          </div>
+        );
+      
+      default:
+        return (
+          <div className={`w-9 h-9 ${baseColors.body} rounded-md`}></div>
+        );
+    }
+  };
   
   return (
-    <div 
-      className={`w-10 h-12 flex flex-col items-center justify-center text-white font-bold relative
-        transform-gpu -translate-y-4 animate-float drop-shadow-lg`}
-    >
-      {/* Character model - can be replaced with actual sprite/image */}
-      <div className={`w-8 h-8 ${ownerColor} rounded-md flex items-center justify-center shadow-md`}>
-        <span>{character.name.substring(0, 2)}</span>
-      </div>
-      
-      {/* Rank */}
-      <div className="absolute -top-3 -right-2 w-5 h-5 rounded-full bg-slate-800 border border-yellow-400 flex items-center justify-center text-xs text-yellow-400">
-        {character.rank}
-      </div>
-      
-      {/* Health bar */}
-      <div className="absolute -bottom-2 w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
-        <div 
-          className={`h-full ${character.health < character.maxHealth * 0.3 ? 'bg-red-500' : 'bg-green-500'}`}
-          style={{ width: `${(character.health / character.maxHealth) * 100}%` }}
-        ></div>
-      </div>
-      
-      {/* Class icon indicator */}
-      <div className="absolute -left-2 -top-1 w-4 h-4 flex items-center justify-center">
-        {character.class === 'Tank' && <Shield size={10} className="text-slate-300" />}
-        {character.class === 'Mage' && <Zap size={10} className="text-purple-300" />}
-        {character.class === 'Hunter' && <Target size={10} className="text-green-300" />}
-        {character.class === 'Assassin' && <Heart size={10} className="text-red-300" />}
-      </div>
-      
-      {/* Action indicators */}
-      <div className="absolute -left-3 top-2 space-y-1">
-        {character.hasMoved && (
-          <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-        )}
-        {character.hasAttacked && (
-          <div className="w-2 h-2 rounded-full bg-red-400"></div>
-        )}
+    <div className={`relative transform-gpu -translate-y-4 ${getRankStyle()}`}>
+      {/* Character model with cell-shaded style */}
+      <div className={`${getClassColorAccent()} border-2 animate-float drop-shadow-lg`}>
+        {getCharacterShape()}
+        
+        {/* Character label - initial or icon */}
+        <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800/80 px-1 py-0 rounded text-xs font-bold">
+          {character.name.substring(0, 2)}
+        </div>
+        
+        {/* Health bar */}
+        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-8 h-1 bg-gray-800 rounded-full overflow-hidden">
+          <div 
+            className={`h-full ${character.health < character.maxHealth * 0.3 ? 'bg-red-500' : 'bg-green-500'}`}
+            style={{ width: `${(character.health / character.maxHealth) * 100}%` }}
+          ></div>
+        </div>
+        
+        {/* Rank indicator */}
+        <div className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-gray-800 border flex items-center justify-center text-[10px]">
+          <span className={character.rank === 'S' ? 'text-yellow-400' : character.rank === 'A' ? 'text-purple-400' : 'text-blue-400'}>
+            {character.rank}
+          </span>
+        </div>
+        
+        {/* Status indicators */}
+        <div className="absolute -left-2 top-0 space-y-1">
+          {character.hasMoved && (
+            <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+          )}
+          {character.hasAttacked && (
+            <div className="w-1.5 h-1.5 rounded-full bg-red-400"></div>
+          )}
+        </div>
       </div>
     </div>
   );

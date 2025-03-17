@@ -139,3 +139,33 @@
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(116, 153, 232, 0.7);
 }
+
+/* Isometric Character Animations */
+@keyframes float {
+  0% {
+    transform: translateY(-4px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-float {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Shadow Glow Effects */
+.shadow-glow {
+  box-shadow: 0 0 8px 2px rgba(116, 153, 232, 0.3);
+}
+
+.shadow-yellow-glow {
+  box-shadow: 0 0 8px 2px rgba(250, 204, 21, 0.3);
+}
+
+.shadow-purple-glow {
+  box-shadow: 0 0 8px 2px rgba(168, 85, 247, 0.3);
+}
