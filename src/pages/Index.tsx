@@ -41,16 +41,11 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-solo-dark">
-      {/* Background with Solo Leveling image */}
+      {/* Background with Solo Leveling image - fixed implementation */}
       <div 
-        className="absolute inset-0 z-0" 
+        className="absolute inset-0 z-0 bg-cover bg-center" 
         style={{
-          backgroundImage: `
-            linear-gradient(to bottom, rgba(26, 27, 38, 0.5), rgba(26, 27, 38, 0.8)), 
-            url('lovable-uploads/e7db9cd6-6d04-497d-8c2f-22727e256434.png')
-          `,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundImage: `linear-gradient(to bottom, rgba(26, 27, 38, 0.5), rgba(26, 27, 38, 0.8)), url('lovable-uploads/e7db9cd6-6d04-497d-8c2f-22727e256434.png')`,
           filter: 'brightness(0.9)',
         }}
       />
