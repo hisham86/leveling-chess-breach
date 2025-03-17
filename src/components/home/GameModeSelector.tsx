@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { Grid2X2, ChessKnight, Clock } from "lucide-react";
+import { Grid2X2, Swords, Clock } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -51,7 +51,7 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMo
                   value="chess" 
                   className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple"
                 >
-                  <ChessKnight size={16} className="mr-2" />
+                  <Swords size={16} className="mr-2" />
                   Chess
                 </ToggleGroupItem>
               </div>

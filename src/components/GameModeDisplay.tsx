@@ -2,7 +2,7 @@
 import React from 'react';
 import { GameState } from '@/game/types';
 import { Badge } from "@/components/ui/badge";
-import { Grid2X2, ChessKnight, Clock } from "lucide-react";
+import { Grid2X2, Swords, Clock } from "lucide-react";
 
 interface GameModeDisplayProps {
   gameState: GameState | null;
@@ -23,7 +23,7 @@ const GameModeDisplay: React.FC<GameModeDisplayProps> = ({ gameState }) => {
       
       {gameState.gameMode === 'chess' && (
         <div className="text-xs text-solo-accent font-bold mt-2 border-t border-solo-accent/30 pt-2 flex items-center gap-2">
-          <ChessKnight size={14} className="text-solo-accent" />
+          <Swords size={14} className="text-solo-accent" />
           Chess Mode: Characters move like chess pieces based on their class
           <Badge variant="outline" className="bg-green-500/20 text-green-300 border-green-500/50">Active</Badge>
         </div>
