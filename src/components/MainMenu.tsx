@@ -35,8 +35,7 @@ const MenuButton = ({ onClick, label }: { onClick: () => void; label: string }) 
       variant="ghost"
       className="w-full py-3 mb-1 justify-start text-white font-mono text-lg tracking-wide 
                 hover:bg-solo-purple/40 hover:text-solo-accent transition-all duration-200 
-                border-l-4 border-transparent hover:border-solo-accent 
-                bg-black/50 backdrop-blur-sm" // Changed to black with transparency for better contrast
+                border-l-4 border-transparent hover:border-solo-accent" 
     >
       {label}
     </Button>
