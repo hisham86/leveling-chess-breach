@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { GameState } from '@/game/types';
+import { Json } from '@/integrations/supabase/types';
 
 export interface SavedGame {
   id: string;
@@ -17,7 +18,8 @@ export const saveGame = async (faction: string, gameData: GameState): Promise<Sa
       .from('saved_games')
       .insert({
         faction,
-        game_data: gameData,
+        game_data: gameData as unknown as Json,
+        user_id: supabase.auth.getUser().then(res => res.data.user?.id) || '',
       })
       .select()
       .single();
@@ -27,7 +29,10 @@ export const saveGame = async (faction: string, gameData: GameState): Promise<Sa
       return null;
     }
 
-    return data;
+    return {
+      ...data,
+      game_data: data.game_data as unknown as GameState
+    } as SavedGame;
   } catch (error) {
     console.error('Unexpected error saving game:', error);
     return null;
@@ -46,7 +51,10 @@ export const getSavedGames = async (): Promise<SavedGame[]> => {
       return [];
     }
 
-    return data || [];
+    return data?.map(game => ({
+      ...game,
+      game_data: game.game_data as unknown as GameState
+    })) as SavedGame[] || [];
   } catch (error) {
     console.error('Unexpected error fetching saved games:', error);
     return [];
@@ -67,7 +75,12 @@ export const getLatestSavedGame = async (): Promise<SavedGame | null> => {
       return null;
     }
 
-    return data;
+    if (!data) return null;
+
+    return {
+      ...data,
+      game_data: data.game_data as unknown as GameState
+    } as SavedGame;
   } catch (error) {
     console.error('Unexpected error fetching latest saved game:', error);
     return null;

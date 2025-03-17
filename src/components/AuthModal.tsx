@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from '@/context/AuthContext';
-import { Google, Facebook, Twitter } from 'lucide-react';
+import { Mail, Globe, MessageSquare } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -49,7 +49,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             onClick={handleGoogleSignIn}
             className="flex items-center justify-start gap-2 bg-white text-gray-800 hover:bg-gray-100"
           >
-            <Google size={18} />
+            <Mail size={18} />
             <span>Continue with Google</span>
           </Button>
           
@@ -57,7 +57,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             onClick={handleFacebookSignIn}
             className="flex items-center justify-start gap-2 bg-[#1877F2] text-white hover:bg-[#1877F2]/90"
           >
-            <Facebook size={18} />
+            <Globe size={18} />
             <span>Continue with Facebook</span>
           </Button>
           
@@ -65,7 +65,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             onClick={handleTwitterSignIn}
             className="flex items-center justify-start gap-2 bg-[#1DA1F2] text-white hover:bg-[#1DA1F2]/90"
           >
-            <Twitter size={18} />
+            <MessageSquare size={18} />
             <span>Continue with Twitter</span>
           </Button>
         </div>
