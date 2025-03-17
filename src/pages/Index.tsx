@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import MainMenu from '@/components/MainMenu';
 import GameTitle from '@/components/GameTitle';
 import { useToast } from "@/hooks/use-toast";
-import { Coffee, Twitter, Linkedin } from "lucide-react";
+import { Coffee, Twitter, Linkedin, User } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -12,29 +13,102 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/context/AuthContext";
+import AuthModal from "@/components/AuthModal";
+import UserProfile from "@/components/UserProfile";
+import { saveGame, getLatestSavedGame } from "@/services/gameService";
+import type { GameState } from "@/game/types";
 
 const Index = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user, isLoading } = useAuth();
   const [faction, setFaction] = useState("S-RANK HUNTERS");
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [hasSavedGame, setHasSavedGame] = useState(false);
+  
+  useEffect(() => {
+    // Check if user has saved games
+    const checkSavedGames = async () => {
+      if (user) {
+        const latestSave = await getLatestSavedGame();
+        setHasSavedGame(!!latestSave);
+        if (latestSave) {
+          setFaction(latestSave.faction);
+        }
+      } else {
+        setHasSavedGame(false);
+      }
+    };
+    
+    checkSavedGames();
+  }, [user]);
 
-  const handleNewGame = () => {
+  const handleNewGame = async () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    
     toast({
       title: "Starting new game...",
       description: "Preparing tactical systems",
     });
+    
+    // This is just a placeholder for actual game data structure
+    const mockGameState = {
+      players: [],
+      gameBoard: [],
+      currentPlayerId: '',
+      selectedCharacterId: null,
+      gamePhase: 'setup' as const,
+      turn: 1,
+      boardSize: { width: 10, height: 10 },
+      winner: null,
+      actionMode: 'none' as const,
+      selectedAbilityId: null
+    };
+    
+    // Save initial game state
+    await saveGame(faction, mockGameState as GameState);
+    
+    // Navigate to game
+    navigate('/game');
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    if (!user) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+    
+    if (!hasSavedGame) {
+      toast({
+        title: "No saved game found",
+        description: "Start a new game to begin",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     toast({
       title: "Loading saved game...",
       description: "Retrieving tactical data",
     });
+    
+    // Navigate to game
+    navigate('/game');
   };
 
   const handleOptions = () => {
     toast({
       description: "Options menu coming soon",
     });
+    navigate('/options');
+  };
+
+  const handleCredits = () => {
+    navigate('/credits');
   };
 
   const handleQuit = () => {
@@ -44,6 +118,10 @@ const Index = () => {
       description: "Quit function only works when deployed",
       variant: "destructive",
     });
+  };
+
+  const handleLogin = () => {
+    setIsAuthModalOpen(true);
   };
 
   return (
@@ -57,6 +135,27 @@ const Index = () => {
         }}
       />
 
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
+      {/* User Profile / Login Button */}
+      <div className="absolute top-4 right-4 z-20">
+        {!isLoading && (
+          user ? (
+            <UserProfile />
+          ) : (
+            <Button 
+              onClick={handleLogin} 
+              variant="ghost" 
+              className="text-white hover:bg-solo-purple/30 border border-solo-accent/50"
+            >
+              <User size={18} className="mr-2" />
+              Sign In
+            </Button>
+          )
+        )}
+      </div>
+
       <div className="z-10 w-full h-full flex flex-col md:flex-row">
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center md:items-start px-8 py-10">
           <div className="w-full max-w-sm">
@@ -67,7 +166,7 @@ const Index = () => {
                 onContinue={handleContinue}
                 onNewGame={handleNewGame} 
                 onOptions={handleOptions}
-                onCredits={() => {}}
+                onCredits={handleCredits}
                 onQuit={handleQuit}
               />
             </div>
