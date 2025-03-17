@@ -48,11 +48,11 @@ const Index = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-solo-dark">
-      {/* Background with new Solo Leveling image */}
+      {/* Background with new Solo Leveling Arise image */}
       <div 
         className="absolute inset-0 z-0 bg-cover bg-center" 
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(26, 27, 38, 0.5), rgba(26, 27, 38, 0.8)), url('public/lovable-uploads/ac73eded-be0d-493b-848a-6c469f0f8f45.png')`,
+          backgroundImage: `linear-gradient(to bottom, rgba(26, 27, 38, 0.5), rgba(26, 27, 38, 0.8)), url('public/lovable-uploads/044b3664-3e8f-46cf-969b-c8d224efe417.png')`,
           filter: 'brightness(0.9)',
         }}
       />
