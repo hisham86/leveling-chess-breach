@@ -24,6 +24,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
   const [faction, setFaction] = useState("S-RANK HUNTERS");
+  const [gameMode, setGameMode] = useState<"standard" | "chess">("standard");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [hasSavedGame, setHasSavedGame] = useState(false);
   
@@ -35,6 +36,7 @@ const Index = () => {
         setHasSavedGame(!!latestSave);
         if (latestSave) {
           setFaction(latestSave.faction);
+          setGameMode(latestSave.gameState.gameMode || "standard");
         }
       } else {
         setHasSavedGame(false);
@@ -66,7 +68,8 @@ const Index = () => {
       boardSize: { width: 10, height: 10 },
       winner: null,
       actionMode: 'none' as const,
-      selectedAbilityId: null
+      selectedAbilityId: null,
+      gameMode: gameMode // Add the selected game mode
     };
     
     // Save initial game state
@@ -161,7 +164,28 @@ const Index = () => {
           <div className="w-full max-w-sm">
             <GameTitle />
             
-            <div className="mt-16">
+            {/* Game Mode Selection - NEW */}
+            <div className="mt-8 mb-4 bg-solo-dark/80 backdrop-blur-sm px-4 py-3 border-l-4 border-solo-accent">
+              <p className="text-white font-mono tracking-wide mb-2">Game Mode:</p>
+              <div className="flex space-x-3">
+                <Button 
+                  variant="outline"
+                  className={`${gameMode === 'standard' ? 'bg-solo-purple text-white' : 'bg-transparent text-white/70'} border border-solo-accent/50`}
+                  onClick={() => setGameMode('standard')}
+                >
+                  Standard
+                </Button>
+                <Button 
+                  variant="outline"
+                  className={`${gameMode === 'chess' ? 'bg-solo-purple text-white' : 'bg-transparent text-white/70'} border border-solo-accent/50`}
+                  onClick={() => setGameMode('chess')}
+                >
+                  Chess
+                </Button>
+              </div>
+            </div>
+            
+            <div className="mt-4">
               <MainMenu 
                 onContinue={handleContinue}
                 onNewGame={handleNewGame} 
