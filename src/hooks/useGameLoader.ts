@@ -14,7 +14,7 @@ export function useGameLoader() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [faction, setFaction] = useState('S-RANK HUNTERS');
-  const [gameMode, setGameMode] = useState<'storyline' | 'chess' | 'checkers'>('chess'); // Default to chess
+  const [gameMode, setGameMode] = useState<'storyline' | 'chess'>('chess'); // Default to chess
 
   useEffect(() => {
     const loadGame = async () => {
@@ -26,10 +26,15 @@ export function useGameLoader() {
           const savedGame = await getLatestSavedGame();
           
           if (savedGame) {
+            // Convert checkers mode to chess if found
+            if (savedGame.game_data.gameMode === 'checkers') {
+              savedGame.game_data.gameMode = 'chess';
+            }
+            
             setGameState(savedGame.game_data);
             setFaction(savedGame.faction);
             if (savedGame.game_data.gameMode) {
-              setGameMode(savedGame.game_data.gameMode);
+              setGameMode(savedGame.game_data.gameMode as 'storyline' | 'chess');
             }
             toast.success("Game loaded successfully");
             setIsLoading(false);
@@ -49,8 +54,8 @@ export function useGameLoader() {
         const playerCharacters = generatePresetCharacters(playerUserId, true);
         const aiCharacters = generatePresetCharacters(aiPlayerId, false);
         
-        // For chess/checkers: If the board is 8x8, adjust the positions
-        if (gameMode === 'chess' || gameMode === 'checkers') {
+        // For chess: If the board is 8x8, adjust the positions
+        if (gameMode === 'chess') {
           // Make sure the board is 8x8
           initialState.boardSize = { width: 8, height: 8 };
           initialState.gameBoard = Array(8).fill(null).map((_, y) => 
@@ -63,8 +68,8 @@ export function useGameLoader() {
             }))
           );
           
-          // Position characters for chess/checkers
-          positionCharactersForBoardGame(playerCharacters, aiCharacters, gameMode);
+          // Position characters for chess
+          positionCharactersForChess(playerCharacters, aiCharacters);
         }
         
         initialState.players[0].characters = playerCharacters;
@@ -100,106 +105,66 @@ export function useGameLoader() {
   return { gameState, setGameState, isLoading, faction, gameMode, setGameMode };
 }
 
-// Helper function to position characters for chess or checkers game
-function positionCharactersForBoardGame(
+// Helper function to position characters for chess game
+function positionCharactersForChess(
   playerCharacters: any[], 
-  aiCharacters: any[], 
-  gameMode: 'chess' | 'checkers' | 'storyline'
+  aiCharacters: any[]
 ) {
-  if (gameMode === 'chess') {
-    // Set player character positions (bottom row)
-    playerCharacters.forEach((char, index) => {
-      // Position main pieces on back row (0-7)
-      if (index < 8) {
-        // From left to right: Tank (Rook), Assassin (Knight), Mage (Bishop), Hunter (Queen), 
-        // Monster (King), Mage, Assassin, Tank 
-        char.position = { x: index, y: 7 };
-        
-        // Set character classes based on chess positions
-        if (index === 0 || index === 7) char.class = 'Tank'; // Rooks
-        else if (index === 1 || index === 6) char.class = 'Assassin'; // Knights
-        else if (index === 2 || index === 5) char.class = 'Mage'; // Bishops
-        else if (index === 3) char.class = 'Hunter'; // Queen
-        else if (index === 4) {
-          char.class = 'Monster'; // King
-          char.rank = 'S';
-        }
-      } 
-      // Position pawns on second row (8-15)
-      else if (index < 16) {
-        char.position = { x: index - 8, y: 6 };
-        char.class = 'Monster'; // Pawns
-        char.rank = 'C';
+  // Set player character positions (bottom row)
+  playerCharacters.forEach((char, index) => {
+    // Position main pieces on back row (0-7)
+    if (index < 8) {
+      // From left to right: Tank (Rook), Assassin (Knight), Mage (Bishop), Hunter (Queen), 
+      // Monster (King), Mage, Assassin, Tank 
+      char.position = { x: index, y: 7 };
+      
+      // Set character classes based on chess positions
+      if (index === 0 || index === 7) char.class = 'Tank'; // Rooks
+      else if (index === 1 || index === 6) char.class = 'Assassin'; // Knights
+      else if (index === 2 || index === 5) char.class = 'Mage'; // Bishops
+      else if (index === 3) char.class = 'Hunter'; // Queen
+      else if (index === 4) {
+        char.class = 'Monster'; // King
+        char.rank = 'S';
       }
-      // Hide any extra characters
-      else {
-        char.position = { x: -1, y: -1 };
-      }
-    });
-    
-    // Set AI character positions (top row)
-    aiCharacters.forEach((char, index) => {
-      // Position main pieces on back row
-      if (index < 8) {
-        char.position = { x: index, y: 0 };
-        
-        // Set character classes based on chess positions
-        if (index === 0 || index === 7) char.class = 'Tank'; // Rooks
-        else if (index === 1 || index === 6) char.class = 'Assassin'; // Knights
-        else if (index === 2 || index === 5) char.class = 'Mage'; // Bishops
-        else if (index === 3) char.class = 'Hunter'; // Queen
-        else if (index === 4) {
-          char.class = 'Monster'; // King
-          char.rank = 'S';
-        }
-      } 
-      // Position pawns on second row
-      else if (index < 16) {
-        char.position = { x: index - 8, y: 1 };
-        char.class = 'Monster'; // Pawns
-        char.rank = 'C';
-      }
-      // Hide any extra characters
-      else {
-        char.position = { x: -1, y: -1 };
-      }
-    });
-  } 
-  else if (gameMode === 'checkers') {
-    // For checkers, set first 12 characters for each player
-    // Player characters on bottom three rows
-    let charIndex = 0;
-    for (let row = 5; row < 8; row++) {
-      for (let col = 0; col < 8; col++) {
-        // Only place on dark squares ((row+col) % 2 === 1)
-        if ((row + col) % 2 === 1 && charIndex < 12) {
-          playerCharacters[charIndex].position = { x: col, y: row };
-          playerCharacters[charIndex].class = 'Monster';
-          charIndex++;
-        }
-      }
+    } 
+    // Position pawns on second row (8-15)
+    else if (index < 16) {
+      char.position = { x: index - 8, y: 6 };
+      char.class = 'Monster'; // Pawns
+      char.rank = 'C';
     }
-    
-    // AI characters on top three rows
-    charIndex = 0;
-    for (let row = 0; row < 3; row++) {
-      for (let col = 0; col < 8; col++) {
-        // Only place on dark squares ((row+col) % 2 === 1)
-        if ((row + col) % 2 === 1 && charIndex < 12) {
-          aiCharacters[charIndex].position = { x: col, y: row };
-          aiCharacters[charIndex].class = 'Monster';
-          charIndex++;
-        }
+    // Hide any extra characters
+    else {
+      char.position = { x: -1, y: -1 };
+    }
+  });
+  
+  // Set AI character positions (top row)
+  aiCharacters.forEach((char, index) => {
+    // Position main pieces on back row
+    if (index < 8) {
+      char.position = { x: index, y: 0 };
+      
+      // Set character classes based on chess positions
+      if (index === 0 || index === 7) char.class = 'Tank'; // Rooks
+      else if (index === 1 || index === 6) char.class = 'Assassin'; // Knights
+      else if (index === 2 || index === 5) char.class = 'Mage'; // Bishops
+      else if (index === 3) char.class = 'Hunter'; // Queen
+      else if (index === 4) {
+        char.class = 'Monster'; // King
+        char.rank = 'S';
       }
+    } 
+    // Position pawns on second row
+    else if (index < 16) {
+      char.position = { x: index - 8, y: 1 };
+      char.class = 'Monster'; // Pawns
+      char.rank = 'C';
     }
-    
-    // Hide any extra characters for both players
-    for (let i = 12; i < playerCharacters.length; i++) {
-      playerCharacters[i].position = { x: -1, y: -1 };
+    // Hide any extra characters
+    else {
+      char.position = { x: -1, y: -1 };
     }
-    
-    for (let i = 12; i < aiCharacters.length; i++) {
-      aiCharacters[i].position = { x: -1, y: -1 };
-    }
-  }
+  });
 }

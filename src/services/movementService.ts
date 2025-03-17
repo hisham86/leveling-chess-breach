@@ -1,8 +1,6 @@
-
 import { GameState, Character, GridPosition } from '@/game/types';
 import { getValidMovePositions } from '@/game/utils';
 import { getChessValidMoves } from '@/game/chessMovement';
-import { getCheckersValidMoves } from '@/game/checkersMovement';
 
 export const highlightValidMoves = (
   character: Character,
@@ -27,8 +25,6 @@ export const highlightValidMoves = (
   
   if (gameState.gameMode === 'chess') {
     validMoves = getChessValidMoves(character, gameState);
-  } else if (gameState.gameMode === 'checkers') {
-    validMoves = getCheckersValidMoves(character, gameState);
   } else {
     // Standard mode
     validMoves = getValidMovePositions(

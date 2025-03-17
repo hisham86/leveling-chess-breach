@@ -1,13 +1,13 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { Grid2X2, Swords, Clock } from "lucide-react";
+import { Swords, Clock } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface GameModeSelectorProps {
-  gameMode: "storyline" | "chess" | "checkers";
-  setGameMode: (value: "storyline" | "chess" | "checkers") => void;
+  gameMode: "storyline" | "chess";
+  setGameMode: (value: "storyline" | "chess") => void;
 }
 
 const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMode }) => {
@@ -17,7 +17,7 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMo
       <ToggleGroup 
         type="single" 
         value={gameMode} 
-        onValueChange={(value) => value && setGameMode(value as "storyline" | "chess" | "checkers")}
+        onValueChange={(value) => value && setGameMode(value as "storyline" | "chess")}
         className="justify-between w-full"
       >
         <TooltipProvider>
@@ -61,34 +61,12 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMo
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="inline-block">
-                <ToggleGroupItem 
-                  value="checkers" 
-                  className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple"
-                >
-                  <Grid2X2 size={16} className="mr-2" />
-                  Checkers
-                </ToggleGroupItem>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Characters move diagonally and can capture by jumping</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
       </ToggleGroup>
       
       {/* Mode description */}
       <div className="mt-3 text-xs text-gray-300 italic">
         {gameMode === 'chess' && (
           <p>Characters move according to chess rules. Hunters move like queens, Tanks like rooks, Mages like bishops, and Assassins like knights.</p>
-        )}
-        {gameMode === 'checkers' && (
-          <p>Move diagonally and capture opponent pieces by jumping over them. S-Rank characters can move backward.</p>
         )}
         {gameMode === 'storyline' && (
           <p>Follow the story and complete missions to level up your hunters and defeat powerful enemies.</p>

@@ -25,7 +25,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [faction, setFaction] = useState("S-RANK HUNTERS");
-  const [gameMode, setGameMode] = useState<"storyline" | "chess" | "checkers">("chess");
+  const [gameMode, setGameMode] = useState<"storyline" | "chess">("chess");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [hasSavedGame, setHasSavedGame] = useState(false);
   
@@ -40,7 +40,8 @@ const Index = () => {
           if (latestSave.game_data && latestSave.game_data.gameMode) {
             // Convert 'standard' to 'storyline' if needed
             const savedMode = latestSave.game_data.gameMode;
-            setGameMode(savedMode);
+            // If the saved mode is 'checkers', default to 'chess'
+            setGameMode(savedMode === 'checkers' ? 'chess' : savedMode as "storyline" | "chess");
           }
         }
       } else {
@@ -52,7 +53,7 @@ const Index = () => {
   }, [user]);
 
   const handleNewGame = () => {
-    // Allow guest play without login for chess and checkers modes
+    // Allow guest play without login for chess mode
     if (gameMode === 'storyline' && !user) {
       setIsAuthModalOpen(true);
       return;

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Tile, Character, GameState } from '@/game/types';
 import { getCharacterAtPosition } from '@/game/utils';
@@ -15,7 +16,6 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameState, onTileClick }) => {
   const [selectedTile, setSelectedTile] = useState<Tile | null>(null);
   
   const isChessMode = gameState.gameMode === 'chess';
-  const isCheckersMode = gameState.gameMode === 'checkers';
   
   const handleTileSelect = (tile: Tile) => {
     setSelectedTile(tile === selectedTile ? null : tile);
@@ -57,7 +57,7 @@ const GameBoard: React.FC<GameBoardProps> = ({ gameState, onTileClick }) => {
                     
                     {character && (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <ChessPiece character={character} isChessMode={isChessMode} isCheckersMode={isCheckersMode} />
+                        <ChessPiece character={character} isChessMode={isChessMode} />
                       </div>
                     )}
                     
@@ -140,8 +140,8 @@ const renderTileFeature = (tile: Tile) => {
   }
 };
 
-const ChessPiece: React.FC<{ character: Character, isChessMode: boolean, isCheckersMode: boolean }> = ({ 
-  character, isChessMode, isCheckersMode 
+const ChessPiece: React.FC<{ character: Character, isChessMode: boolean }> = ({ 
+  character, isChessMode 
 }) => {
   const isPlayer1 = character.owner === 'guest-player' || character.owner.includes('1');
   const pieceColor = isPlayer1 ? 'text-blue-600' : 'text-red-600';
@@ -157,8 +157,6 @@ const ChessPiece: React.FC<{ character: Character, isChessMode: boolean, isCheck
           return character.rank === 'S' ? '♚' : '♟︎';
         default: return '♟︎';
       }
-    } else if (isCheckersMode) {
-      return character.rank === 'S' ? '⬤' : '●';
     } else {
       return '◆';
     }
