@@ -74,7 +74,7 @@ const Index = () => {
 
             <div className="mt-8">
               <div className="bg-solo-dark/80 backdrop-blur-sm px-4 py-2 border-l-4 border-solo-accent mb-3">
-                <p className="text-white font-mono tracking-wide mb-2">Faction: {faction}</p>
+                <p className="text-white font-mono tracking-wide mb-2">Faction:</p>
                 
                 <Select 
                   value={faction} 
