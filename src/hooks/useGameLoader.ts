@@ -14,7 +14,7 @@ export function useGameLoader() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [faction, setFaction] = useState('S-RANK HUNTERS');
-  const [gameMode, setGameMode] = useState<'storyline' | 'chess' | 'checkers'>('storyline');
+  const [gameMode, setGameMode] = useState<'storyline' | 'chess' | 'checkers'>('chess'); // Default to chess
 
   useEffect(() => {
     const loadGame = async () => {
@@ -42,7 +42,7 @@ export function useGameLoader() {
           const aiPlayerId = 'ai-player';
           const initialState = createInitialGameState(user.id, aiPlayerId);
           
-          // Add game mode
+          // Add game mode (use the current gameMode state, which defaults to chess)
           initialState.gameMode = gameMode;
           
           // Create characters based on faction
@@ -67,7 +67,7 @@ export function useGameLoader() {
           );
           
           setGameState(initialState);
-          toast.info("New game created");
+          toast.info(`New ${gameMode} game created`);
         }
       } catch (error) {
         console.error("Error loading game:", error);
@@ -80,5 +80,5 @@ export function useGameLoader() {
     loadGame();
   }, [user, navigate, gameMode]);
 
-  return { gameState, setGameState, isLoading, faction };
+  return { gameState, setGameState, isLoading, faction, gameMode, setGameMode };
 }

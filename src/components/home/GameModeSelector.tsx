@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { Clock } from "lucide-react";
+import { Grid2X2, ChessKnight, Clock } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -18,6 +18,7 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMo
         type="single" 
         value={gameMode} 
         onValueChange={(value) => value && setGameMode(value as "storyline" | "chess" | "checkers")}
+        className="justify-between w-full"
       >
         <TooltipProvider>
           <Tooltip>
@@ -28,9 +29,9 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMo
                   value="storyline" 
                   className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple opacity-60 cursor-not-allowed"
                 >
+                  <Clock size={16} className="mr-2" />
                   Storyline
                   <Badge variant="outline" className="ml-2 bg-amber-500/20 text-amber-300 border-amber-500/50">
-                    <Clock size={12} className="mr-1" />
                     Soon
                   </Badge>
                 </ToggleGroupItem>
@@ -41,19 +42,58 @@ const GameModeSelector: React.FC<GameModeSelectorProps> = ({ gameMode, setGameMo
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        <ToggleGroupItem 
-          value="chess" 
-          className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple"
-        >
-          Chess
-        </ToggleGroupItem>
-        <ToggleGroupItem 
-          value="checkers" 
-          className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple"
-        >
-          Checkers
-        </ToggleGroupItem>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="inline-block">
+                <ToggleGroupItem 
+                  value="chess" 
+                  className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple"
+                >
+                  <ChessKnight size={16} className="mr-2" />
+                  Chess
+                </ToggleGroupItem>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Characters move like chess pieces based on their class</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+        
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="inline-block">
+                <ToggleGroupItem 
+                  value="checkers" 
+                  className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple"
+                >
+                  <Grid2X2 size={16} className="mr-2" />
+                  Checkers
+                </ToggleGroupItem>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Characters move diagonally and can capture by jumping</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </ToggleGroup>
+      
+      {/* Mode description */}
+      <div className="mt-3 text-xs text-gray-300 italic">
+        {gameMode === 'chess' && (
+          <p>Characters move according to chess rules. Hunters move like queens, Tanks like rooks, Mages like bishops, and Assassins like knights.</p>
+        )}
+        {gameMode === 'checkers' && (
+          <p>Move diagonally and capture opponent pieces by jumping over them. S-Rank characters can move backward.</p>
+        )}
+        {gameMode === 'storyline' && (
+          <p>Follow the story and complete missions to level up your hunters and defeat powerful enemies.</p>
+        )}
+      </div>
     </div>
   );
 };
