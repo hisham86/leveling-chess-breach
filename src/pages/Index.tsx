@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -18,13 +17,14 @@ import AuthModal from "@/components/AuthModal";
 import UserProfile from "@/components/UserProfile";
 import { saveGame, getLatestSavedGame } from "@/services/gameService";
 import type { GameState } from "@/game/types";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user, isLoading } = useAuth();
   const [faction, setFaction] = useState("S-RANK HUNTERS");
-  const [gameMode, setGameMode] = useState<"standard" | "chess">("standard");
+  const [gameMode, setGameMode] = useState<"standard" | "chess" | "checkers">("standard");
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [hasSavedGame, setHasSavedGame] = useState(false);
   
@@ -36,7 +36,9 @@ const Index = () => {
         setHasSavedGame(!!latestSave);
         if (latestSave) {
           setFaction(latestSave.faction);
-          setGameMode(latestSave.gameState.gameMode || "standard");
+          if (latestSave.game_data && latestSave.game_data.gameMode) {
+            setGameMode(latestSave.game_data.gameMode);
+          }
         }
       } else {
         setHasSavedGame(false);
@@ -164,25 +166,20 @@ const Index = () => {
           <div className="w-full max-w-sm">
             <GameTitle />
             
-            {/* Game Mode Selection - NEW */}
+            {/* Game Mode Selection - Updated with Checkers */}
             <div className="mt-8 mb-4 bg-solo-dark/80 backdrop-blur-sm px-4 py-3 border-l-4 border-solo-accent">
               <p className="text-white font-mono tracking-wide mb-2">Game Mode:</p>
-              <div className="flex space-x-3">
-                <Button 
-                  variant="outline"
-                  className={`${gameMode === 'standard' ? 'bg-solo-purple text-white' : 'bg-transparent text-white/70'} border border-solo-accent/50`}
-                  onClick={() => setGameMode('standard')}
-                >
+              <ToggleGroup type="single" value={gameMode} onValueChange={(value) => value && setGameMode(value as "standard" | "chess" | "checkers")}>
+                <ToggleGroupItem value="standard" className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple">
                   Standard
-                </Button>
-                <Button 
-                  variant="outline"
-                  className={`${gameMode === 'chess' ? 'bg-solo-purple text-white' : 'bg-transparent text-white/70'} border border-solo-accent/50`}
-                  onClick={() => setGameMode('chess')}
-                >
+                </ToggleGroupItem>
+                <ToggleGroupItem value="chess" className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple">
                   Chess
-                </Button>
-              </div>
+                </ToggleGroupItem>
+                <ToggleGroupItem value="checkers" className="text-white border border-solo-accent/50 data-[state=on]:bg-solo-purple">
+                  Checkers
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
             
             <div className="mt-4">

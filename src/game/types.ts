@@ -70,4 +70,5 @@ export interface GameState {
   winner: string | null;
   actionMode: 'move' | 'attack' | 'ability' | 'none';
   selectedAbilityId: string | null;
+  gameMode: 'standard' | 'chess' | 'checkers';
 }

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { GameState, Character, GridPosition } from '@/game/types';
@@ -26,20 +25,16 @@ const GameController: React.FC<GameControllerProps> = ({
   const handleEndTurn = () => {
     if (!gameState) return;
     
-    // Copy game state
     const newGameState = { ...gameState };
     
-    // Find current and next player
     const currentPlayerIndex = newGameState.players.findIndex(
       p => p.id === newGameState.currentPlayerId
     );
     const nextPlayerIndex = (currentPlayerIndex + 1) % newGameState.players.length;
     
-    // Update player turns
     newGameState.players = newGameState.players.map((player, index) => ({
       ...player,
       isCurrentTurn: index === nextPlayerIndex,
-      // Reset characters' moved/attacked status for next turn
       characters: player.characters.map(char => ({
         ...char,
         hasMoved: index === nextPlayerIndex ? false : char.hasMoved,
@@ -51,22 +46,17 @@ const GameController: React.FC<GameControllerProps> = ({
       }))
     }));
     
-    // Update current player
     newGameState.currentPlayerId = newGameState.players[nextPlayerIndex].id;
     
-    // Increment turn counter if all players have taken their turn
     if (nextPlayerIndex === 0) {
       newGameState.turn += 1;
     }
     
-    // Clear selections
     newGameState.selectedCharacterId = null;
     newGameState.actionMode = 'none';
     
-    // Update game state
     setGameState(newGameState);
     
-    // Save game
     saveGame(faction, newGameState);
     
     toast.info(`Turn ${newGameState.turn}: ${newGameState.players[nextPlayerIndex].name}'s turn`);
@@ -78,14 +68,11 @@ const GameController: React.FC<GameControllerProps> = ({
     const newGameState = { ...gameState };
     
     if (newGameState.selectedCharacterId === characterId) {
-      // Deselect if already selected
       newGameState.selectedCharacterId = null;
       newGameState.actionMode = 'none';
     } else {
-      // Select new character
       newGameState.selectedCharacterId = characterId;
       
-      // Reset board highlights
       newGameState.gameBoard = newGameState.gameBoard.map(row =>
         row.map(tile => ({
           ...tile,
@@ -98,21 +85,18 @@ const GameController: React.FC<GameControllerProps> = ({
     setGameState(newGameState);
   };
   
-  // New function to handle chess-like movement
-  const handleShowMoves = () => {
+  const handleShowCheckersMove = () => {
     if (!gameState || !gameState.selectedCharacterId) return;
     
     const newGameState = { ...gameState };
     newGameState.actionMode = 'move';
     
-    // Find the selected character
     const selectedCharacter = gameState.players
       .flatMap(p => p.characters)
       .find(c => c.id === gameState.selectedCharacterId);
     
     if (!selectedCharacter) return;
     
-    // First, reset all highlights
     newGameState.gameBoard = newGameState.gameBoard.map(row =>
       row.map(tile => ({
         ...tile,
@@ -121,10 +105,8 @@ const GameController: React.FC<GameControllerProps> = ({
       }))
     );
     
-    // Get valid moves for chess-like movement based on character class
-    const validMoves = getChessValidMoves(selectedCharacter, newGameState);
+    const validMoves = getCheckersValidMoves(selectedCharacter, newGameState);
     
-    // Highlight valid move positions
     validMoves.forEach(pos => {
       if (pos.x >= 0 && pos.x < newGameState.boardSize.width && 
           pos.y >= 0 && pos.y < newGameState.boardSize.height) {
@@ -137,108 +119,187 @@ const GameController: React.FC<GameControllerProps> = ({
     setSelectedAction('move');
   };
   
-  // Chess-like movement patterns based on character class
+  const getCheckersValidMoves = (character: Character, gameState: GameState): GridPosition[] => {
+    const validMoves: GridPosition[] = [];
+    const { x, y } = character.position;
+    const allCharacters = gameState.players.flatMap(p => p.characters);
+    const isPlayer1 = character.owner === gameState.players[0].id;
+    
+    const forwardY = isPlayer1 ? 1 : -1;
+    
+    const regularMoves = [
+      { x: x - 1, y: y + forwardY },
+      { x: x + 1, y: y + forwardY }
+    ];
+    
+    regularMoves.forEach(pos => {
+      if (pos.x >= 0 && pos.x < gameState.boardSize.width && 
+          pos.y >= 0 && pos.y < gameState.boardSize.height) {
+        const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
+        if (!charAtPos) {
+          validMoves.push(pos);
+        }
+      }
+    });
+    
+    const captureMoves = [
+      { jumpX: x - 1, jumpY: y + forwardY, landX: x - 2, landY: y + (forwardY * 2) },
+      { jumpX: x + 1, jumpY: y + forwardY, landX: x + 2, landY: y + (forwardY * 2) }
+    ];
+    
+    captureMoves.forEach(move => {
+      if (move.landX >= 0 && move.landX < gameState.boardSize.width && 
+          move.landY >= 0 && move.landY < gameState.boardSize.height) {
+        const jumpCharacter = allCharacters.find(
+          c => c.position.x === move.jumpX && c.position.y === move.jumpY && c.owner !== character.owner
+        );
+        
+        const landingCharacter = allCharacters.find(
+          c => c.position.x === move.landX && c.position.y === move.landY
+        );
+        
+        if (jumpCharacter && !landingCharacter) {
+          validMoves.push({ x: move.landX, y: move.landY });
+        }
+      }
+    });
+    
+    if (character.rank === 'S') {
+      const backwardY = isPlayer1 ? -1 : 1;
+      
+      const kingMoves = [
+        { x: x - 1, y: y + backwardY },
+        { x: x + 1, y: y + backwardY }
+      ];
+      
+      kingMoves.forEach(pos => {
+        if (pos.x >= 0 && pos.x < gameState.boardSize.width && 
+            pos.y >= 0 && pos.y < gameState.boardSize.height) {
+          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
+          if (!charAtPos) {
+            validMoves.push(pos);
+          }
+        }
+      });
+      
+      const kingCaptures = [
+        { jumpX: x - 1, jumpY: y + backwardY, landX: x - 2, landY: y + (backwardY * 2) },
+        { jumpX: x + 1, jumpY: y + backwardY, landX: x + 2, landY: y + (backwardY * 2) }
+      ];
+      
+      kingCaptures.forEach(move => {
+        if (move.landX >= 0 && move.landX < gameState.boardSize.width && 
+            move.landY >= 0 && move.landY < gameState.boardSize.height) {
+          const jumpCharacter = allCharacters.find(
+            c => c.position.x === move.jumpX && c.position.y === move.jumpY && c.owner !== character.owner
+          );
+          
+          const landingCharacter = allCharacters.find(
+            c => c.position.x === move.landX && c.position.y === move.landY
+          );
+          
+          if (jumpCharacter && !landingCharacter) {
+            validMoves.push({ x: move.landX, y: move.landY });
+          }
+        }
+      });
+    }
+    
+    return validMoves;
+  };
+  
+  const handleShowMoves = () => {
+    if (!gameState) return;
+    
+    if (gameState.gameMode === 'checkers') {
+      handleShowCheckersMove();
+    } else if (gameState.gameMode === 'chess') {
+      handleShowChessMove();
+    } else {
+      handleShowStandardMove();
+    }
+  };
+  
+  const handleShowChessMove = () => {
+    if (!gameState || !gameState.selectedCharacterId) return;
+    
+    const newGameState = { ...gameState };
+    newGameState.actionMode = 'move';
+    
+    const selectedCharacter = gameState.players
+      .flatMap(p => p.characters)
+      .find(c => c.id === gameState.selectedCharacterId);
+    
+    if (!selectedCharacter) return;
+    
+    newGameState.gameBoard = newGameState.gameBoard.map(row =>
+      row.map(tile => ({
+        ...tile,
+        highlighted: false,
+        highlightType: 'none'
+      }))
+    );
+    
+    const validMoves = getChessValidMoves(selectedCharacter, newGameState);
+    
+    validMoves.forEach(pos => {
+      if (pos.x >= 0 && pos.x < newGameState.boardSize.width && 
+          pos.y >= 0 && pos.y < newGameState.boardSize.height) {
+        newGameState.gameBoard[pos.y][pos.x].highlighted = true;
+        newGameState.gameBoard[pos.y][pos.x].highlightType = 'move';
+      }
+    });
+    
+    setGameState(newGameState);
+    setSelectedAction('move');
+  };
+  
+  const handleShowStandardMove = () => {
+    if (!gameState || !gameState.selectedCharacterId) return;
+    
+    const newGameState = { ...gameState };
+    newGameState.actionMode = 'move';
+    
+    const selectedCharacter = gameState.players
+      .flatMap(p => p.characters)
+      .find(c => c.id === gameState.selectedCharacterId);
+    
+    if (!selectedCharacter) return;
+    
+    newGameState.gameBoard = newGameState.gameBoard.map(row =>
+      row.map(tile => ({
+        ...tile,
+        highlighted: false,
+        highlightType: 'none'
+      }))
+    );
+    
+    const validMoves = getValidMovePositions(
+      selectedCharacter.position,
+      selectedCharacter.moveRange,
+      newGameState.gameBoard,
+      newGameState.boardSize
+    );
+    
+    validMoves.forEach(pos => {
+      if (pos.x >= 0 && pos.x < newGameState.boardSize.width && 
+          pos.y >= 0 && pos.y < newGameState.boardSize.height) {
+        newGameState.gameBoard[pos.y][pos.x].highlighted = true;
+        newGameState.gameBoard[pos.y][pos.x].highlightType = 'move';
+      }
+    });
+    
+    setGameState(newGameState);
+    setSelectedAction('move');
+  };
+  
   const getChessValidMoves = (character: Character, gameState: GameState): GridPosition[] => {
     const validMoves: GridPosition[] = [];
     const { x, y } = character.position;
     const allCharacters = gameState.players.flatMap(p => p.characters);
     
-    // Define movement patterns based on character class (like chess pieces)
     switch(character.class) {
-      case 'Tank': // Rook-like movement
-        // Horizontal moves (right)
-        for (let i = x + 1; i < gameState.boardSize.width; i++) {
-          const pos = { x: i, y };
-          const charAtPos = allCharacters.find(c => c.position.x === i && c.position.y === y);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos); // Can capture enemy
-            break; // Cannot move past any character
-          }
-          validMoves.push(pos);
-        }
-        
-        // Horizontal moves (left)
-        for (let i = x - 1; i >= 0; i--) {
-          const pos = { x: i, y };
-          const charAtPos = allCharacters.find(c => c.position.x === i && c.position.y === y);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos);
-            break;
-          }
-          validMoves.push(pos);
-        }
-        
-        // Vertical moves (down)
-        for (let j = y + 1; j < gameState.boardSize.height; j++) {
-          const pos = { x, y: j };
-          const charAtPos = allCharacters.find(c => c.position.x === x && c.position.y === j);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos);
-            break;
-          }
-          validMoves.push(pos);
-        }
-        
-        // Vertical moves (up)
-        for (let j = y - 1; j >= 0; j--) {
-          const pos = { x, y: j };
-          const charAtPos = allCharacters.find(c => c.position.x === x && c.position.y === j);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos);
-            break;
-          }
-          validMoves.push(pos);
-        }
-        break;
-        
-      case 'Mage': // Bishop-like movement
-        // Diagonal moves (top-right)
-        for (let i = 1; x + i < gameState.boardSize.width && y - i >= 0; i++) {
-          const pos = { x: x + i, y: y - i };
-          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos);
-            break;
-          }
-          validMoves.push(pos);
-        }
-        
-        // Diagonal moves (bottom-right)
-        for (let i = 1; x + i < gameState.boardSize.width && y + i < gameState.boardSize.height; i++) {
-          const pos = { x: x + i, y: y + i };
-          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos);
-            break;
-          }
-          validMoves.push(pos);
-        }
-        
-        // Diagonal moves (bottom-left)
-        for (let i = 1; x - i >= 0 && y + i < gameState.boardSize.height; i++) {
-          const pos = { x: x - i, y: y + i };
-          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos);
-            break;
-          }
-          validMoves.push(pos);
-        }
-        
-        // Diagonal moves (top-left)
-        for (let i = 1; x - i >= 0 && y - i >= 0; i++) {
-          const pos = { x: x - i, y: y - i };
-          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
-          if (charAtPos) {
-            if (charAtPos.owner !== character.owner) validMoves.push(pos);
-            break;
-          }
-          validMoves.push(pos);
-        }
-        break;
-        
-      case 'Hunter': // Queen-like movement (combines rook and bishop)
-        // Horizontal and vertical moves (rook-like)
+      case 'Tank':
         for (let i = x + 1; i < gameState.boardSize.width; i++) {
           const pos = { x: i, y };
           const charAtPos = allCharacters.find(c => c.position.x === i && c.position.y === y);
@@ -278,8 +339,9 @@ const GameController: React.FC<GameControllerProps> = ({
           }
           validMoves.push(pos);
         }
+        break;
         
-        // Diagonal moves (bishop-like)
+      case 'Mage':
         for (let i = 1; x + i < gameState.boardSize.width && y - i >= 0; i++) {
           const pos = { x: x + i, y: y - i };
           const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
@@ -321,7 +383,89 @@ const GameController: React.FC<GameControllerProps> = ({
         }
         break;
         
-      case 'Assassin': // Knight-like L-shaped movement
+      case 'Hunter':
+        for (let i = x + 1; i < gameState.boardSize.width; i++) {
+          const pos = { x: i, y };
+          const charAtPos = allCharacters.find(c => c.position.x === i && c.position.y === y);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        
+        for (let i = x - 1; i >= 0; i--) {
+          const pos = { x: i, y };
+          const charAtPos = allCharacters.find(c => c.position.x === i && c.position.y === y);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        
+        for (let j = y + 1; j < gameState.boardSize.height; j++) {
+          const pos = { x, y: j };
+          const charAtPos = allCharacters.find(c => c.position.x === x && c.position.y === j);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        
+        for (let j = y - 1; j >= 0; j--) {
+          const pos = { x, y: j };
+          const charAtPos = allCharacters.find(c => c.position.x === x && c.position.y === j);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        
+        for (let i = 1; x + i < gameState.boardSize.width && y - i >= 0; i++) {
+          const pos = { x: x + i, y: y - i };
+          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        
+        for (let i = 1; x + i < gameState.boardSize.width && y + i < gameState.boardSize.height; i++) {
+          const pos = { x: x + i, y: y + i };
+          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        
+        for (let i = 1; x - i >= 0 && y + i < gameState.boardSize.height; i++) {
+          const pos = { x: x - i, y: y + i };
+          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        
+        for (let i = 1; x - i >= 0 && y - i >= 0; i++) {
+          const pos = { x: x - i, y: y - i };
+          const charAtPos = allCharacters.find(c => c.position.x === pos.x && c.position.y === pos.y);
+          if (charAtPos) {
+            if (charAtPos.owner !== character.owner) validMoves.push(pos);
+            break;
+          }
+          validMoves.push(pos);
+        }
+        break;
+        
+      case 'Assassin':
         const knightMoves = [
           { x: x + 2, y: y + 1 }, { x: x + 2, y: y - 1 },
           { x: x - 2, y: y + 1 }, { x: x - 2, y: y - 1 },
@@ -340,7 +484,7 @@ const GameController: React.FC<GameControllerProps> = ({
         });
         break;
         
-      case 'Monster': // King-like movement (one square in any direction)
+      case 'Monster':
         const kingMoves = [
           { x: x + 1, y }, { x: x - 1, y }, { x, y: y + 1 }, { x, y: y - 1 },
           { x: x + 1, y: y + 1 }, { x: x + 1, y: y - 1 }, 
@@ -359,10 +503,9 @@ const GameController: React.FC<GameControllerProps> = ({
         break;
         
       default:
-        // Default movement (2 squares in any direction)
         for (let i = Math.max(0, x - 2); i <= Math.min(gameState.boardSize.width - 1, x + 2); i++) {
           for (let j = Math.max(0, y - 2); j <= Math.min(gameState.boardSize.height - 1, y + 2); j++) {
-            if (i !== x || j !== y) { // Skip current position
+            if (i !== x || j !== y) {
               const pos = { x: i, y: j };
               const charAtPos = allCharacters.find(c => c.position.x === i && c.position.y === j);
               if (!charAtPos || charAtPos.owner !== character.owner) {
@@ -375,7 +518,7 @@ const GameController: React.FC<GameControllerProps> = ({
     
     return validMoves;
   };
-
+  
   const getActionButtonClass = (action: string, isDisabled: boolean = false) => {
     const baseClass = "px-3 py-1 text-sm font-mono rounded text-white transition";
     
@@ -390,7 +533,6 @@ const GameController: React.FC<GameControllerProps> = ({
     return `${baseClass} bg-solo-purple/40 hover:bg-solo-purple/60 border border-solo-accent/50`;
   };
   
-  // Check if it's the player's turn
   const isPlayerTurn = () => {
     if (!gameState || !user) return false;
     
@@ -445,6 +587,12 @@ const GameController: React.FC<GameControllerProps> = ({
       {gameState?.gameMode === 'chess' && (
         <div className="text-xs text-solo-accent font-bold mt-2 border-t border-solo-accent/30 pt-2">
           Chess Mode: Characters move like chess pieces
+        </div>
+      )}
+      
+      {gameState?.gameMode === 'checkers' && (
+        <div className="text-xs text-solo-accent font-bold mt-2 border-t border-solo-accent/30 pt-2">
+          Checkers Mode: Diagonal movement with jumps to capture
         </div>
       )}
     </div>
