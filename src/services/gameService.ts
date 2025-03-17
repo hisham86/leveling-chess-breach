@@ -14,12 +14,21 @@ export interface SavedGame {
 
 export const saveGame = async (faction: string, gameData: GameState): Promise<SavedGame | null> => {
   try {
+    // First, get the user ID
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      console.error('No authenticated user found');
+      return null;
+    }
+    
+    // Now insert the data with the user ID
     const { data, error } = await supabase
       .from('saved_games')
       .insert({
         faction,
         game_data: gameData as unknown as Json,
-        user_id: supabase.auth.getUser().then(res => res.data.user?.id) || '',
+        user_id: user.id,
       })
       .select()
       .single();
