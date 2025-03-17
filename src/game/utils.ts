@@ -46,18 +46,22 @@ export const isPositionInAttackRange = (
 
 // Get all valid move positions for a character
 export const getValidMovePositions = (
-  character: Character,
-  gameState: GameState
+  startPos: GridPosition,
+  moveRange: number,
+  gameBoard: Tile[][],
+  boardSize: { width: number; height: number }
 ): GridPosition[] => {
   const validPositions: GridPosition[] = [];
-  const { boardSize } = gameState;
 
   // Check all positions within move range
   for (let y = 0; y < boardSize.height; y++) {
     for (let x = 0; x < boardSize.width; x++) {
       const pos = { x, y };
-      if (isPositionInMoveRange(character, pos, gameState)) {
-        validPositions.push(pos);
+      if (calculateDistance(startPos, pos) <= moveRange) {
+        // Check if position is empty
+        if (gameBoard[y]?.[x] && gameBoard[y][x].occupiedBy === null) {
+          validPositions.push(pos);
+        }
       }
     }
   }
@@ -147,7 +151,8 @@ export const createInitialGameState = (
     boardSize: { width: boardWidth, height: boardHeight },
     winner: null,
     actionMode: 'none',
-    selectedAbilityId: null
+    selectedAbilityId: null,
+    gameMode: 'standard' // Add the gameMode property with default value
   };
 };
 
@@ -172,3 +177,4 @@ export const calculateDamage = (attacker: Character, defender: Character): numbe
 export const generateId = (): string => {
   return Math.random().toString(36).substring(2, 15);
 };
+
