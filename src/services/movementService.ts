@@ -39,7 +39,7 @@ export const highlightValidMoves = (
     );
   }
   
-  // Highlight valid moves
+  // Highlight valid moves with green highlight
   validMoves.forEach(pos => {
     if (pos.x >= 0 && pos.x < newGameState.boardSize.width && 
         pos.y >= 0 && pos.y < newGameState.boardSize.height) {
@@ -63,6 +63,7 @@ export const selectCharacter = (
   } else {
     newGameState.selectedCharacterId = characterId;
     
+    // Reset all highlights when changing selected character
     newGameState.gameBoard = newGameState.gameBoard.map(row =>
       row.map(tile => ({
         ...tile,
@@ -105,6 +106,15 @@ export const endTurn = (gameState: GameState): GameState => {
   
   newGameState.selectedCharacterId = null;
   newGameState.actionMode = 'none';
+  
+  // Clear all highlights when turn ends
+  newGameState.gameBoard = newGameState.gameBoard.map(row =>
+    row.map(tile => ({
+      ...tile,
+      highlighted: false,
+      highlightType: 'none'
+    }))
+  );
   
   return newGameState;
 };

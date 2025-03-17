@@ -44,8 +44,24 @@ const GameController: React.FC<GameControllerProps> = ({
   const handleSelectCharacter = (characterId: string | null) => {
     if (!gameState) return;
     
+    // First, handle character selection
     const newGameState = selectCharacter(characterId, gameState);
-    setGameState(newGameState);
+    
+    // If a character was selected (not deselected), automatically show valid moves
+    const selectedCharacter = characterId ? 
+      gameState.players
+        .flatMap(p => p.characters)
+        .find(c => c.id === characterId) : null;
+    
+    if (selectedCharacter) {
+      // Show valid moves for the selected character
+      const gameStateWithMoves = highlightValidMoves(selectedCharacter, newGameState);
+      setGameState(gameStateWithMoves);
+      setSelectedAction('move');
+    } else {
+      setGameState(newGameState);
+      setSelectedAction(null);
+    }
   };
   
   const handleShowMoves = () => {
