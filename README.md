@@ -2,9 +2,9 @@
 # Monarch Gambit
 Try it now ➡️ https://leveling-chess-breach.lovable.app/
 
-![Image Alt](https://github.com/hisham86/racing-game/blob/71d95ddf172cf5a3e3d879f997cf396c5c5e1483/racing%20main%20menu.png)
+![Game Main Menu](public/lovable-uploads/12922396-b5bd-4042-9a18-b10dade7fccc.png)
 
-![Image Alt](https://github.com/hisham86/racing-game/blob/71d95ddf172cf5a3e3d879f997cf396c5c5e1483/racing%20game.png)
+![Game Gameplay](public/lovable-uploads/96edd7bd-0a2f-4d85-86b2-7c34cd1bbdbd.png)
 
 ## About the Game
 
