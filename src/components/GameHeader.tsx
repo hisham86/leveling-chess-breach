@@ -21,7 +21,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({ faction }) => {
         <ArrowLeft size={16} className="mr-2" />
         Main Menu
       </Button>
-      <h1 className="text-xl font-bold text-solo-accent">Tactical Breach</h1>
+      <h1 className="text-xl font-bold text-solo-accent">MGS: Monarch Gambit Shadow</h1>
       <div className="text-sm">
         Faction: <span className="text-solo-accent">{faction}</span>
       </div>
