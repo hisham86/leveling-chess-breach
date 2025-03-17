@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -142,7 +141,7 @@ const Index = () => {
 
       <div className="z-10 w-full h-full flex flex-col md:flex-row">
         <div className="w-full md:w-1/2 flex flex-col justify-center items-center md:items-start px-8 py-10">
-          <div className="w-full max-w-sm">
+          <div className="w-full max-w-sm bg-black/40 backdrop-blur-sm p-6 rounded-lg">
             <GameTitle />
             
             {/* Game Mode and Faction Selection */}

@@ -15,12 +15,11 @@ const GameBackground: React.FC<GameBackgroundProps> = ({ children }) => {
           backgroundImage: "url('/lovable-uploads/25ee92ee-bf6c-46ae-8ef0-ec760eb7aeb4.png')", 
           backgroundSize: "cover",
           backgroundPosition: "center",
-          opacity: 0.85 
+          opacity: 1 // Increased opacity to show image more clearly
         }}
       />
       
-      {/* Darkening overlay to ensure text remains readable */}
-      <div className="absolute inset-0 z-0 bg-[#1A1F2C]/70" />
+      {/* No global darkening overlay anymore - will use targeted overlay in content areas */}
       
       {/* Subtle purple glow effects */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#6E59A5]/20 rounded-full blur-[100px]" />

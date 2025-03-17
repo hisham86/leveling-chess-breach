@@ -15,7 +15,7 @@ interface FactionSelectorProps {
 
 const FactionSelector: React.FC<FactionSelectorProps> = ({ faction, setFaction }) => {
   return (
-    <div className="mb-4 bg-solo-dark/80 backdrop-blur-sm px-4 py-2 border-l-4 border-solo-accent">
+    <div className="mb-4 bg-black/60 backdrop-blur-sm px-4 py-2 border-l-4 border-solo-accent">
       <p className="text-white font-mono tracking-wide mb-2">Faction:</p>
       <Select value={faction} onValueChange={setFaction}>
         <SelectTrigger className="w-full bg-solo-dark border-solo-accent/50 text-white">
