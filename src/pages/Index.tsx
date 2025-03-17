@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
@@ -156,6 +157,7 @@ const Index = () => {
                 onOptions={handleOptions}
                 onCredits={handleCredits}
                 onQuit={handleQuit}
+                hasSavedGame={hasSavedGame} // Pass hasSavedGame state to MainMenu
               />
             </div>
 
